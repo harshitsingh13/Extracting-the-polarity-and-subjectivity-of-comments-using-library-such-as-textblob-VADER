@@ -1,0 +1,124 @@
+##drive.mount('/content/drive')
+import pandas as pd
+import numpy as np
+from textblob import TextBlob
+#import matplotlib.pyplot as plt1 
+import matplotlib.pyplot as plt 
+import math 
+  
+reddit_df = pd.read_pickle("/content/drive/My Drive/redditDataset.pkl")
+data=reddit_df
+data=data.drop_duplicates(subset=None, keep='first', inplace=False)
+data=data.to_numpy()
+n1=0
+n2=0
+p1=0
+s1=0
+p2=0
+s2=0
+poln=[]
+polh=[]
+subn=[]
+subh=[]
+count1=[]
+count2=[]
+count3=[]
+count4=[]
+spoln=[]
+spolh=[]
+ssubn=[]
+ssubh=[]
+pol=[]
+sub=[]
+for i in data:
+  test=TextBlob(i[0])
+  pol.append(test.sentiment.polarity)
+  sub.append(test.sentiment.subjectivity)
+  #print(i[1])
+  if(i[1]=="news"):
+    #print('no')
+    n1+=1
+    p1+=test.sentiment.polarity
+    s1+=test.sentiment.subjectivity
+    poln.append(test.sentiment.polarity)
+    subn.append(test.sentiment.subjectivity)
+
+  else:
+    #print('yes')
+    n2+=1
+    p2+=test.sentiment.polarity
+    s2+=test.sentiment.subjectivity
+    polh.append(test.sentiment.polarity)
+    subh.append(test.sentiment.subjectivity)
+poln.sort()
+subn.sort()
+polh.sort()
+subh.sort()
+for i in range(0,len(poln)):
+    if poln[i] not in spoln:
+        spoln.append(poln[i])
+    if subn[i] not in ssubn:
+        ssubn.append(subn[i])
+for i in range(0,len(polh)):
+    if polh[i] not in spolh:
+        spolh.append(polh[i])
+    if subh[i] not in ssubh:
+        ssubh.append(subh[i])
+
+
+
+###########sum
+#p1=sum(spoln)
+#p2=sum(spolh)
+#s1=sum(ssubn)
+#s2=sum(ssubh)
+#fig = plt.figure()
+#plt1 = fig.add_subplot(221)
+#plt2 = fig.add_subplot(222)
+#plt3 = fig.add_subplot(223)
+#plt4 = fig.add_subplot(224)
+
+#print(n1,p1,s1,n2,p2,s2)
+mean_p1=p1/n1
+mean_p2=p2/n2
+mean_s1=s1/n1
+mean_s2=s2/n2
+vp1=0
+vp2=0
+vs1=0
+vs2=0
+for i in range(0,len(spoln)):
+  #vp1+=(spoln[i]-mean_p1)**2
+  count1.append(poln.count(spoln[i]))
+for i in range(0,len(spolh)):
+  #vp2+=(spolh[i]-mean_p2)**2
+  count2.append(polh.count(spolh[i]))
+for i in range(0,len(ssubn)):
+  #vs1+=(ssubn[i]-mean_s1)**2
+  count3.append(subn.count(ssubn[i]))
+for i in range(0,len(ssubh)):
+  #vs2+=(ssubh[i]-mean_s2)**2
+  count4.append(subh.count(ssubh[i]))
+
+for i in data:
+  test=TextBlob(i[0])
+  if(i[1]=='news'):
+    vp1+=(test.sentiment.polarity-mean_p1)**2
+    vs1+=(test.sentiment.subjectivity-mean_s1)**2
+  else:
+    #print(vp2)
+    vp2+=(test.sentiment.polarity-mean_p2)**2
+    vs2+=(test.sentiment.subjectivity-mean_s2)**2
+
+plt.plot(spoln,count1)
+plt.xlabel('polarity of news')
+# Set the y axis label of the current axis.
+plt.ylabel('# of comments')
+# Set a title 
+#plt.title('Draw a line.')
+plt.show()
+#print(vs2)
+var_p1=math.sqrt(vp1/n1)
+var_p2=math.sqrt(vp2/n2)
+var_s1=math.sqrt(vs1/n1)
+var_s2=math.sqrt(vs2/n2)
